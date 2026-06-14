@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Sistema de Gestión</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            📚 GestionLibros
+            <span>Sistema de Gestión</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/libros"><span class="icon">📖</span> Libros</a></li>
+            <li><a href="/usuarios"><span class="icon">👥</span> Usuarios</a></li>
+            <li><a href="/categorias"><span class="icon">🏷️</span> Categorías</a></li>
+            <li><a href="/prestamos"><span class="icon">🔄</span> Préstamos</a></li>
+            <li><a href="/reportes" class="active"><span class="icon">📊</span> Reportes</a></li>
+        </ul>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="header">
+            <h2>📊 Reportes del Sistema</h2>
+            <div class="breadcrumb">
+                <a href="/libros">Inicio</a> / Reportes
+            </div>
+        </div>
+
+        <div class="container">
+
+            <!-- Libros más prestados -->
+            <div class="card">
+                <h2>📈 Libros más Prestados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Total Préstamos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .masPrestados}}
+                        <tr>
+                            <td>{{.ID}}</td>
+                            <td>{{.Titulo}}</td>
+                            <td>{{.Autor}}</td>
+                            <td>{{.Total}}</td>
+                        </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="4">No hay datos disponibles</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Usuarios más activos -->
+            <div class="card">
+                <h2>👥 Usuarios más Activos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Total Préstamos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .activos}}
+                        <tr>
+                            <td>{{.ID}}</td>
+                            <td>{{.Nombre}}</td>
+                            <td>{{.Email}}</td>
+                            <td>{{.Total}}</td>
+                        </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="4">No hay datos disponibles</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Libros disponibles -->
+            <div class="card">
+                <h2>✅ Libros Disponibles</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .disponibles}}
+                        <tr>
+                            <td>{{.ID}}</td>
+                            <td>{{.Titulo}}</td>
+                            <td>{{.Autor}}</td>
+                        </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="3">No hay libros disponibles</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

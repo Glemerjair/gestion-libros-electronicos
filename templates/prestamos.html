@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Préstamos - Sistema de Gestión</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            📚 GestionLibros
+            <span>Sistema de Gestión</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/libros"><span class="icon">📖</span> Libros</a></li>
+            <li><a href="/usuarios"><span class="icon">👥</span> Usuarios</a></li>
+            <li><a href="/categorias"><span class="icon">🏷️</span> Categorías</a></li>
+            <li><a href="/prestamos" class="active"><span class="icon">🔄</span> Préstamos</a></li>
+            <li><a href="/reportes"><span class="icon">📊</span> Reportes</a></li>
+        </ul>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="header">
+            <h2>🔄 Gestión de Préstamos</h2>
+            <div class="breadcrumb">
+                <a href="/libros">Inicio</a> / Préstamos
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div class="form-row">
+                <!-- Formulario realizar préstamo -->
+                <div class="card" style="flex:1">
+                    <h2>Realizar Préstamo</h2>
+                    <form action="/prestamos/realizar" method="POST">
+                        <div class="form-group">
+                            <label>ID del Libro</label>
+                            <input type="number" name="libro_id" placeholder="ID del libro" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ID del Usuario</label>
+                            <input type="number" name="usuario_id" placeholder="ID del usuario" required>
+                        </div>
+                        <button type="submit" class="btn">Realizar Préstamo</button>
+                    </form>
+                </div>
+
+                <!-- Formulario devolver libro -->
+                <div class="card" style="flex:1">
+                    <h2>Devolver Libro</h2>
+                    <form action="/prestamos/devolver" method="POST">
+                        <div class="form-group">
+                            <label>ID del Préstamo</label>
+                            <input type="number" name="prestamo_id" placeholder="ID del préstamo" required>
+                        </div>
+                        <button type="submit" class="btn btn-ver">Devolver Libro</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de préstamos activos -->
+            <div class="card">
+                <h2>Préstamos Activos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ID Libro</th>
+                            <th>ID Usuario</th>
+                            <th>Fecha Préstamo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .prestamos}}
+                        <tr>
+                            <td>{{.ID}}</td>
+                            <td>{{.LibroID}}</td>
+                            <td>{{.UsuarioID}}</td>
+                            <td>{{.FechaPrestamo}}</td>
+                            <td>{{if .Activo}}✅ Activo{{else}}❌ Devuelto{{end}}</td>
+                        </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="5">No hay préstamos activos</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
