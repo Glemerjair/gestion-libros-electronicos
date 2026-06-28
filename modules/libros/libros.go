@@ -106,8 +106,14 @@ func EliminarLibro(db *sql.DB, id int) error {
 		return errors.New("el ID del libro no es válido")
 	}
 
-	query := "DELETE FROM libros WHERE id = ?"
-	_, err := db.Exec(query, id)
+	// Primero eliminar los préstamos asociados al libro
+	_, err := db.Exec("DELETE FROM prestamos WHERE libro_id = ?", id)
+	if err != nil {
+		return fmt.Errorf("error al eliminar préstamos del libro: %w", err)
+	}
+
+	// Luego eliminar el libro
+	_, err = db.Exec("DELETE FROM libros WHERE id = ?", id)
 	if err != nil {
 		return fmt.Errorf("error al eliminar libro: %w", err)
 	}

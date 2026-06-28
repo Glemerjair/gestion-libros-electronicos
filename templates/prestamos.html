@@ -21,6 +21,11 @@
             <li><a href="/prestamos" class="active"><span class="icon">🔄</span> Préstamos</a></li>
             <li><a href="/reportes"><span class="icon">📊</span> Reportes</a></li>
         </ul>
+        <div style="position:absolute; bottom:20px; width:100%;">
+            <a href="/logout" style="display:flex; align-items:center; gap:10px; padding:13px 20px; color:#cce4f5; text-decoration:none; font-size:14px;">
+                <span class="icon">🔓</span> Cerrar Sesión
+            </a>
+        </div>
     </div>
 
     <!-- Contenido principal -->
@@ -36,20 +41,26 @@
 
             <div class="form-row">
                 <!-- Formulario realizar préstamo -->
-                <div class="card" style="flex:1">
-                    <h2>Realizar Préstamo</h2>
-                    <form action="/prestamos/realizar" method="POST">
-                        <div class="form-group">
-                            <label>ID del Libro</label>
-                            <input type="number" name="libro_id" placeholder="ID del libro" required>
-                        </div>
-                        <div class="form-group">
-                            <label>ID del Usuario</label>
-                            <input type="number" name="usuario_id" placeholder="ID del usuario" required>
-                        </div>
-                        <button type="submit" class="btn">Realizar Préstamo</button>
-                    </form>
-                </div>
+            <div class="card" style="flex:1">
+                <h2>Realizar Préstamo</h2>
+                <form action="/prestamos/realizar" method="POST">
+                    <div class="form-group">
+                        <label>Buscar Libro</label>
+                        <input type="text" id="buscar-libro" placeholder="Escribe el título o autor..." autocomplete="off">
+                        <div id="acordeon-libros" style="display:none; border:1px solid #ddd; border-radius:6px; margin-top:4px; max-height:200px; overflow-y:auto;"></div>
+                        <input type="hidden" name="libro_id" id="libro_id">
+                        <small id="libro-seleccionado" style="color:#1B5E8C; font-weight:bold;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Buscar Usuario</label>
+                        <input type="text" id="buscar-usuario" placeholder="Escribe el nombre o email..." autocomplete="off">
+                        <div id="acordeon-usuarios" style="display:none; border:1px solid #ddd; border-radius:6px; margin-top:4px; max-height:200px; overflow-y:auto;"></div>
+                        <input type="hidden" name="usuario_id" id="usuario_id">
+                        <small id="usuario-seleccionado" style="color:#1B5E8C; font-weight:bold;"></small>
+                    </div>
+                    <button type="submit" class="btn">Realizar Préstamo</button>
+                </form>
+            </div>
 
                 <!-- Formulario devolver libro -->
                 <div class="card" style="flex:1">
@@ -69,34 +80,128 @@
                 <h2>Préstamos Activos</h2>
                 <table>
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>ID Libro</th>
-                            <th>ID Usuario</th>
-                            <th>Fecha Préstamo</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{range .prestamos}}
-                        <tr>
-                            <td>{{.ID}}</td>
-                            <td>{{.LibroID}}</td>
-                            <td>{{.UsuarioID}}</td>
-                            <td>{{.FechaPrestamo}}</td>
-                            <td>{{if .Activo}}✅ Activo{{else}}❌ Devuelto{{end}}</td>
-                        </tr>
-                        {{else}}
-                        <tr>
-                            <td colspan="5">No hay préstamos activos</td>
-                        </tr>
-                        {{end}}
-                    </tbody>
+                    <tr>
+                        <th>ID</th>
+                        <th>Libro</th>
+                        <th>Usuario</th>
+                        <th>Fecha Préstamo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .prestamos}}
+                    <tr>
+                        <td>{{.ID}}</td>
+                        <td>{{.TituloLibro}}</td>
+                        <td>{{.NombreUsuario}}</td>
+                        <td>{{.FechaPrestamo}}</td>
+                        <td>{{if .Activo}}✅ Activo{{else}}❌ Devuelto{{end}}</td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="5">No hay préstamos activos</td>
+                    </tr>
+                    {{end}}
+                </tbody>
                 </table>
             </div>
 
         </div>
     </div>
+
+    <script>
+    // ── Buscador de libros ──
+    const buscarLibro = document.getElementById('buscar-libro');
+    const acordeonLibros = document.getElementById('acordeon-libros');
+    const libroId = document.getElementById('libro_id');
+    const libroSeleccionado = document.getElementById('libro-seleccionado');
+
+    buscarLibro.addEventListener('input', async function() {
+        const q = this.value.trim();
+        if (q.length < 2) {
+            acordeonLibros.style.display = 'none';
+            return;
+        }
+        const res = await fetch(`/libros/buscar-json?q=${encodeURIComponent(q)}`);
+        const libros = await res.json();
+        acordeonLibros.innerHTML = '';
+        if (libros && libros.length > 0) {
+            libros.forEach(l => {
+                const item = document.createElement('div');
+                item.style.cssText = 'padding:10px 14px; cursor:pointer; border-bottom:1px solid #f0f0f0; font-size:14px;';
+                item.textContent = `${l.Titulo} — ${l.Autor} ${l.Disponible ? '✅' : '❌'}`;
+                item.addEventListener('mouseover', () => item.style.background = '#f0f4f8');
+                item.addEventListener('mouseout', () => item.style.background = 'white');
+                item.addEventListener('click', () => {
+                    if (!l.Disponible) {
+                        alert('Este libro no está disponible para préstamo');
+                        return;
+                    }
+                    libroId.value = l.ID;
+                    buscarLibro.value = l.Titulo;
+                    libroSeleccionado.textContent = `Libro seleccionado: ${l.Titulo} (ID: ${l.ID})`;
+                    acordeonLibros.style.display = 'none';
+                });
+                acordeonLibros.appendChild(item);
+            });
+            acordeonLibros.style.display = 'block';
+        } else {
+            acordeonLibros.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!buscarLibro.contains(e.target) && !acordeonLibros.contains(e.target)) {
+            acordeonLibros.style.display = 'none';
+        }
+    });
+
+    // ── Buscador de usuarios ──
+    const buscarUsuario = document.getElementById('buscar-usuario');
+    const acordeonUsuarios = document.getElementById('acordeon-usuarios');
+    const usuarioId = document.getElementById('usuario_id');
+    const usuarioSeleccionado = document.getElementById('usuario-seleccionado');
+
+    buscarUsuario.addEventListener('input', async function() {
+        const q = this.value.trim();
+        if (q.length < 2) {
+            acordeonUsuarios.style.display = 'none';
+            return;
+        }
+        const res = await fetch(`/usuarios/buscar-json?q=${encodeURIComponent(q)}`);
+        const usuarios = await res.json();
+        acordeonUsuarios.innerHTML = '';
+        if (usuarios && usuarios.length > 0) {
+            usuarios.forEach(u => {
+                const item = document.createElement('div');
+                item.style.cssText = 'padding:10px 14px; cursor:pointer; border-bottom:1px solid #f0f0f0; font-size:14px;';
+                item.textContent = `${u.Nombre} — ${u.Email} ${u.Activo ? '✅' : '❌ Inactivo'}`;
+                item.addEventListener('mouseover', () => item.style.background = '#f0f4f8');
+                item.addEventListener('mouseout', () => item.style.background = 'white');
+                item.addEventListener('click', () => {
+                    if (!u.Activo) {
+                        alert('Este usuario está inactivo');
+                        return;
+                    }
+                    usuarioId.value = u.ID;
+                    buscarUsuario.value = u.Nombre;
+                    usuarioSeleccionado.textContent = `Usuario seleccionado: ${u.Nombre} (ID: ${u.ID})`;
+                    acordeonUsuarios.style.display = 'none';
+                });
+                acordeonUsuarios.appendChild(item);
+            });
+            acordeonUsuarios.style.display = 'block';
+        } else {
+            acordeonUsuarios.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!buscarUsuario.contains(e.target) && !acordeonUsuarios.contains(e.target)) {
+            acordeonUsuarios.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>

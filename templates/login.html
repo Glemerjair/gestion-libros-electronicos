@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Gestión</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body style="display:flex; justify-content:center; align-items:center; min-height:100vh; background-color:#f0f2f5;">
+
+    <div style="background:white; border-radius:12px; padding:40px; width:100%; max-width:400px; box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+        <div style="text-align:center; margin-bottom:30px;">
+            <div style="font-size:48px; margin-bottom:10px;">📚</div>
+            <h1 style="font-size:22px; color:#1B5E8C; margin-bottom:4px;">GestionLibros</h1>
+            <p style="font-size:14px; color:#888;">Sistema de Gestión de Libros Electrónicos</p>
+        </div>
+
+        {{if .error}}
+        <div style="background:#FCEBEB; color:#A32D2D; padding:10px 14px; border-radius:6px; font-size:14px; margin-bottom:20px;">
+            {{.error}}
+        </div>
+        {{end}}
+
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" name="usuario" placeholder="Ingresa tu usuario" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+            <button type="submit" class="btn" style="width:100%; padding:12px; font-size:15px; margin-top:10px;">
+                Iniciar Sesión
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

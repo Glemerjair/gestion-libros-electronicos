@@ -21,6 +21,11 @@
             <li><a href="/prestamos"><span class="icon">🔄</span> Préstamos</a></li>
             <li><a href="/reportes"><span class="icon">📊</span> Reportes</a></li>
         </ul>
+        <div style="position:absolute; bottom:20px; width:100%;">
+            <a href="/logout" style="display:flex; align-items:center; gap:10px; padding:13px 20px; color:#cce4f5; text-decoration:none; font-size:14px;">
+                <span class="icon">🔓</span> Cerrar Sesión
+            </a>
+        </div>
     </div>
 
     <!-- Contenido principal -->
@@ -75,7 +80,8 @@
                             <td>{{.FechaRegistro}}</td>
                             <td>{{if .Activo}}✅ Activo{{else}}❌ Inactivo{{end}}</td>
                             <td>
-                                <a href="/usuarios/eliminar/{{.ID}}" class="btn btn-eliminar">Desactivar</a>
+                                <a href="/usuarios/editar/{{.ID}}" class="btn btn-ver">Editar</a>
+                                <a href="/usuarios/toggleactivo/{{.ID}}" class="btn btn-eliminar">{{if .Activo}}Desactivar{{else}}Activar{{end}}</a>
                             </td>
                         </tr>
                         {{else}}
@@ -92,6 +98,28 @@
 
 </body>
 </html>
+
+<!-- Formulario editar usuario -->
+            {{if .usuarioEditar.ID}}
+            <div class="card">
+                <h2>Editar Usuario</h2>
+                <form action="/usuarios/actualizar" method="POST">
+                    <input type="hidden" name="id" value="{{.usuarioEditar.ID}}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" name="nombre" value="{{.usuarioEditar.Nombre}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" value="{{.usuarioEditar.Email}}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-ver">Guardar Cambios</button>
+                    <a href="/usuarios" class="btn btn-eliminar" style="margin-left:10px">Cancelar</a>
+                </form>
+            </div>
+            {{end}}
 
 <!-- Formulario buscar usuario -->
             <div class="card">

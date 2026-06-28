@@ -21,6 +21,11 @@
             <li><a href="/prestamos"><span class="icon">🔄</span> Préstamos</a></li>
             <li><a href="/reportes"><span class="icon">📊</span> Reportes</a></li>
         </ul>
+        <div style="position:absolute; bottom:20px; width:100%;">
+            <a href="/logout" style="display:flex; align-items:center; gap:10px; padding:13px 20px; color:#cce4f5; text-decoration:none; font-size:14px;">
+                <span class="icon">🔓</span> Cerrar Sesión
+            </a>
+        </div>
     </div>
 
     <!-- Contenido principal -->
@@ -58,13 +63,48 @@
                             <input type="text" name="enlace_drive" placeholder="https://drive.google.com/...">
                         </div>
                         <div class="form-group">
-                            <label>ID Categoría</label>
-                            <input type="number" name="categoria_id" placeholder="ID de categoría">
+                            <label>Categoría</label>
+                            <input type="text" id="buscar-categoria" placeholder="Escribe el nombre de la categoría..." autocomplete="off">
+                            <div id="acordeon-categorias" style="display:none; border:1px solid #ddd; border-radius:6px; margin-top:4px; max-height:200px; overflow-y:auto;"></div>
+                            <input type="hidden" name="categoria_id" id="categoria_id">
+                            <small id="categoria-seleccionada" style="color:#1B5E8C; font-weight:bold;"></small>
                         </div>
                     </div>
                     <button type="submit" class="btn">Agregar Libro</button>
                 </form>
             </div>
+
+            <!-- Formulario editar libro -->
+            {{if .libroEditar.ID}}
+            <div class="card">
+                <h2>Editar Libro</h2>
+                <form action="/libros/actualizar" method="POST">
+                    <input type="hidden" name="id" value="{{.libroEditar.ID}}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" name="titulo" value="{{.libroEditar.Titulo}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Autor</label>
+                            <input type="text" name="autor" value="{{.libroEditar.Autor}}" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Año de Publicación</label>
+                            <input type="number" name="anio" value="{{.libroEditar.AnioPublicacion}}">
+                        </div>
+                        <div class="form-group">
+                            <label>Enlace Google Drive</label>
+                            <input type="text" name="enlace_drive" value="{{.libroEditar.EnlaceDrive}}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-ver">Guardar Cambios</button>
+                    <a href="/libros" class="btn btn-eliminar" style="margin-left:10px">Cancelar</a>
+                </form>
+            </div>
+            {{end}}
 
             <!-- Formulario buscar libro -->
             <div class="card">
@@ -101,6 +141,7 @@
                             <td>{{if .Disponible}}✅{{else}}❌{{end}}</td>
                             <td>
                                 <a href="{{.EnlaceDrive}}" target="_blank" class="btn btn-ver">Ver</a>
+                                <a href="/libros/editar/{{.ID}}" class="btn btn-ver">Editar</a>
                                 <a href="/libros/eliminar/{{.ID}}" class="btn btn-eliminar">Eliminar</a>
                             </td>
                         </tr>
@@ -134,6 +175,7 @@
                             <td>{{if .Disponible}}✅{{else}}❌{{end}}</td>
                             <td>
                                 <a href="{{.EnlaceDrive}}" target="_blank" class="btn btn-ver">Ver</a>
+                                <a href="/libros/editar/{{.ID}}" class="btn btn-ver">Editar</a>
                                 <a href="/libros/eliminar/{{.ID}}" class="btn btn-eliminar">Eliminar</a>
                             </td>
                         </tr>
@@ -148,6 +190,49 @@
 
         </div>
     </div>
+
+<script>
+    const buscarCategoria = document.getElementById('buscar-categoria');
+    const acordeonCategorias = document.getElementById('acordeon-categorias');
+    const categoriaId = document.getElementById('categoria_id');
+    const categoriaSeleccionada = document.getElementById('categoria-seleccionada');
+
+    buscarCategoria.addEventListener('input', async function() {
+        const q = this.value.trim();
+        if (q.length < 1) {
+            acordeonCategorias.style.display = 'none';
+            return;
+        }
+        const res = await fetch(`/categorias/buscar-json?q=${encodeURIComponent(q)}`);
+        const categorias = await res.json();
+        acordeonCategorias.innerHTML = '';
+        if (categorias && categorias.length > 0) {
+            categorias.forEach(cat => {
+                const item = document.createElement('div');
+                item.style.cssText = 'padding:10px 14px; cursor:pointer; border-bottom:1px solid #f0f0f0; font-size:14px;';
+                item.textContent = `${cat.Nombre} — ${cat.Descripcion}`;
+                item.addEventListener('mouseover', () => item.style.background = '#f0f4f8');
+                item.addEventListener('mouseout', () => item.style.background = 'white');
+                item.addEventListener('click', () => {
+                    categoriaId.value = cat.ID;
+                    buscarCategoria.value = cat.Nombre;
+                    categoriaSeleccionada.textContent = `Categoría seleccionada: ${cat.Nombre} (ID: ${cat.ID})`;
+                    acordeonCategorias.style.display = 'none';
+                });
+                acordeonCategorias.appendChild(item);
+            });
+            acordeonCategorias.style.display = 'block';
+        } else {
+            acordeonCategorias.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!buscarCategoria.contains(e.target) && !acordeonCategorias.contains(e.target)) {
+            acordeonCategorias.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>
