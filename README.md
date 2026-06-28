@@ -98,3 +98,18 @@ gestion-libros-electronicos/
 ├── templates/
 
 └── static/
+
+## Servicios Web API
+
+El sistema expone 8 endpoints REST que devuelven datos en formato JSON para consumo externo.
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | http://localhost:8080/api/libros | Lista todos los libros del catálogo |
+| GET | http://localhost:8080/api/libros/buscar?q={criterio} | Busca libros por título o autor |
+| GET | http://localhost:8080/api/usuarios | Lista todos los usuarios registrados |
+| GET | http://localhost:8080/api/categorias | Lista todas las categorías |
+| GET | http://localhost:8080/api/prestamos | Lista los préstamos activos |
+| GET | http://localhost:8080/api/reportes/libros-mas-prestados | Ranking de libros más prestados |
+| GET | http://localhost:8080/api/reportes/usuarios-activos | Usuarios con más actividad |
+| GET | http://localhost:8080/api/reportes/libros-disponibles | Libros disponibles actualmente |
